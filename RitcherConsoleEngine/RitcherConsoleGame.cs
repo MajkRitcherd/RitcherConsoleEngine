@@ -9,12 +9,15 @@
     /// </remarks>
     public abstract class RitcherConsoleGame
     {
+        private short _screenHeight;
+        private short _screenWidth;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RitcherConsoleGame"/> class.
         /// </summary>
         /// <param name="screenWidth">Screen width (console columns).</param>
         /// <param name="screenHeight">Screen height (console rows).</param>
-        protected RitcherConsoleGame(ushort screenWidth = 160, ushort screenHeight = 80)
+        protected RitcherConsoleGame(short screenWidth = 160, short screenHeight = 80)
         {
             ScreenHeight = screenHeight;
             ScreenWidth = screenWidth;
@@ -23,11 +26,31 @@
         /// <summary>
         /// Gets screen height (console rows).
         /// </summary>
-        public ushort ScreenHeight { get; protected set; }
+        public short ScreenHeight
+        {
+            get => _screenHeight;
+            protected set
+            {
+                if (value < 0)
+                    throw new ArgumentOutOfRangeException(nameof(ScreenHeight), "Screen height must be greaer than or equal to zero.");
+
+                _screenHeight = value;
+            }
+        }
 
         /// <summary>
         /// Get screen width (console columns).
         /// </summary>
-        public ushort ScreenWidth { get; protected set; }
+        public short ScreenWidth
+        {
+            get => _screenWidth;
+            protected set
+            {
+                if (value < 0)
+                    throw new ArgumentOutOfRangeException(nameof(ScreenWidth), "Screen width must be greater than or equal to zero.");
+
+                _screenWidth = value;
+            }
+        }
     }
 }
