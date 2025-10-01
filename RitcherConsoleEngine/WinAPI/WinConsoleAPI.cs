@@ -16,7 +16,8 @@ namespace RitcherConsoleEngine.WinAPI
         /// <returns>Handle to the console screen buffer.</returns>
         public static IntPtr CreateScreenBuffer(AccessRights accessRights, ShareModes shareModes)
         {
-            return CreateConsoleScreenBuffer((uint)accessRights, (uint)shareModes, IntPtr.Zero, 1, IntPtr.Zero);
+            return CheckWinAPIResult(CreateConsoleScreenBuffer((uint)accessRights, (uint)shareModes, IntPtr.Zero, 1, IntPtr.Zero),
+                "Failed to create console screen buffer");
         }
 
         /// <summary>
@@ -80,10 +81,33 @@ namespace RitcherConsoleEngine.WinAPI
         private static void CheckWinAPIResult(bool apiCallResult, string failureMessage)
         {
             if (!apiCallResult)
-            {
-                var errorCode = Marshal.GetLastWin32Error();
-                throw new ConsoleCoreException($"{failureMessage}. Error code: {errorCode}.");
-            }
+                throw new ConsoleCoreException(ComposeErrorMessage(failureMessage));
+        }
+
+        /// <summary>
+        /// Checks Window API call result (pointer).
+        /// </summary>
+        /// <param name="apiCallResult">Window API call result (pointer).</param>
+        /// <param name="failureMessage">Message to be thrown with exception.</param>
+        /// <returns>Handle (pointer).</returns>
+        /// <exception cref="ConsoleCoreException">Throws Console CORE exception if windows API fails.</exception>
+        private static IntPtr CheckWinAPIResult(IntPtr apiCallResult, string failureMessage)
+        {
+            if (apiCallResult == IntPtr.Zero)
+                throw new ConsoleCoreException(ComposeErrorMessage(failureMessage));
+
+            return apiCallResult;
+        }
+
+        /// <summary>
+        /// Composes an error message with error code.
+        /// </summary>
+        /// <param name="message">Error message.</param>
+        /// <returns>Error message with error code.</returns>
+        private static string ComposeErrorMessage(string message)
+        {
+            var errorCode = Marshal.GetLastWin32Error();
+            return $"{message}. Error code: {errorCode}.";
         }
 
         #region Import Console functions

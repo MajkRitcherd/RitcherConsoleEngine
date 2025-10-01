@@ -1,4 +1,7 @@
-﻿namespace RitcherConsoleEngine
+﻿using RitcherConsoleEngine.WinAPI;
+using RitcherConsoleEngine.WinAPI.ConsoleApiStructures;
+
+namespace RitcherConsoleEngine
 {
     /// <summary>
     /// This class is used to be inherited in application to create console games/simulation. <br />
@@ -11,6 +14,8 @@
     {
         private short _screenHeight;
         private short _screenWidth;
+        private IntPtr _screenBufferHandle;
+        private ConsoleSmallRectangle _windowCoordinates;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RitcherConsoleGame"/> class.
@@ -21,6 +26,13 @@
         {
             ScreenHeight = screenHeight;
             ScreenWidth = screenWidth;
+
+            _windowCoordinates = new ConsoleSmallRectangle { Left = 0, Top = 0, Right = (short)(ScreenWidth - 1), Bottom = (short)(ScreenHeight - 1) };
+            _screenBufferHandle = WinConsoleAPI.CreateScreenBuffer(AccessRights.GenericReadAndWrite, ShareModes.FileShareReadAndWrite);
+
+            WinConsoleAPI.SetActiveScreenBuffer(_screenBufferHandle);
+            WinConsoleAPI.SetScreenBufferSize(_screenBufferHandle, new ConsoleCoordinate { X = ScreenWidth, Y = ScreenHeight });
+            WinConsoleAPI.SetWindowInfo(_screenBufferHandle, true, ref _windowCoordinates);
         }
 
         /// <summary>
