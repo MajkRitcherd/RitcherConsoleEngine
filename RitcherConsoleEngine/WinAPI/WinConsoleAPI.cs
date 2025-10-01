@@ -30,6 +30,30 @@ namespace RitcherConsoleEngine.WinAPI
         }
 
         /// <summary>
+        /// Changes the size of the specified console screen buffer.
+        /// </summary>
+        /// <param name="screenBufferHandle">A handle to the console screen buffer.</param>
+        /// <param name="bufferSize">Size of a screen buffer.</param>
+        /// <returns>True on success, otherwise false.</returns>
+        public static bool SetScreenBufferSize(IntPtr screenBufferHandle, ConsoleCoordinate bufferSize)
+        {
+            return SetConsoleScreenBufferSize(screenBufferHandle, bufferSize);
+        }
+
+        /// <summary>
+        /// Sets the current size and position of a console screen buffer's window.
+        /// </summary>
+        /// <param name="screenBufferHandle">A handle to the console screen buffer.</param>
+        /// <param name="areAbsoluteCoordinates">If true, coordinates specify the new upper-left and lower-right corners of the window,
+        ///                                      otherwise coordinates are relative to the current window-corner coordinates.</param>
+        /// <param name="coordinates">Coordinates of the new window.</param>
+        /// <returns>True on success, otherwise false.</returns>
+        public static bool SetWindowInfo(IntPtr screenBufferHandle, bool areAbsoluteCoordinates, ref ConsoleSmallRectangle coordinates)
+        {
+            return SetConsoleWindowInfo(screenBufferHandle, areAbsoluteCoordinates, ref coordinates);
+        }
+
+        /// <summary>
         /// Writes character and color attribute data to a specified rectangular block of character cells in a console screen buffer.
         /// </summary>
         /// <param name="screenBufferHandle">A handle to the console screen buffer.</param>
@@ -67,6 +91,28 @@ namespace RitcherConsoleEngine.WinAPI
         /// <returns>True on success, False on fail.</returns>
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool SetConsoleActiveScreenBuffer(IntPtr hConsoleOutput);
+
+        /// <summary>
+        /// Changes the size of the specified console screen buffer.
+        /// See https://learn.microsoft.com/en-us/windows/console/setconsolescreenbuffersize.
+        /// </summary>
+        /// <param name="hConsoleOutput">A handle to the console screen buffer.</param>
+        /// <param name="dwSize">A <see cref="ConsoleCoordinate"/> structure that specifies the new size of the console screen buffer, in character rows and columns.</param>
+        /// <returns>True on success, False on fail.</returns>
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool SetConsoleScreenBufferSize(IntPtr hConsoleOutput, ConsoleCoordinate dwSize);
+
+        /// <summary>
+        /// Sets the current size and position of a console screen buffer's window.
+        /// See https://learn.microsoft.com/en-us/windows/console/setconsolewindowinfo.
+        /// </summary>
+        /// <param name="hConsoleOutput">A handle to the console screen buffer.</param>
+        /// <param name="bAbsolute">If this parameter is TRUE, the coordinates specify the new upper-left and lower-right corners of the window.
+        ///                         If it is FALSE, the coordinates are relative to the current window-corner coordinates.</param>
+        /// <param name="lpConsoleWindow ">A pointer to a <see cref="ConsoleSmallRectangle"/> structure that specifies the new upper-left and lower-right corners of the window.</param>
+        /// <returns>True on success, False on fail.</returns>
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool SetConsoleWindowInfo(IntPtr hConsoleOutput, bool bAbsolute, ref ConsoleSmallRectangle lpConsoleWindow);
 
         /// <summary>
         /// Writes character and color attribute data to a specified rectangular block of character cells in a console screen buffer. <br />
