@@ -9,6 +9,16 @@ namespace RitcherConsoleEngine.WinAPI
     internal static class WinConsoleAPI
     {
         /// <summary>
+        /// Closes an open object handle.
+        /// </summary>
+        /// <param name="handle">A valid handle to an open object.</param>
+        public static void CloseHandle(IntPtr handle)
+        {
+            CheckWinAPIResult(CloseHandleInternal(handle),
+                "Failed to close the handle");
+        }
+
+        /// <summary>
         /// Creates a console screen buffer.
         /// </summary>
         /// <param name="accessRights">Windows console access right.</param>
@@ -111,6 +121,15 @@ namespace RitcherConsoleEngine.WinAPI
         }
 
         #region Import Console functions
+
+        /// <summary>
+        /// Closes an open object handle.
+        /// See https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle.
+        /// </summary>
+        /// <param name="hObject">A valid handle to an open object.</param>
+        /// <returns>True on success, False on fail.</returns>
+        [DllImport("kernel32.dll", EntryPoint = "CloseHandle", SetLastError = true)]
+        private static extern bool CloseHandleInternal(IntPtr hObject);
 
         /// <summary>
         /// Creates a console screen buffer.

@@ -10,11 +10,12 @@ namespace RitcherConsoleEngine
     /// <remarks>
     /// Application must inherit this class and implement methods which defines game logic and rendering. <br />
     /// </remarks>
-    public abstract class RitcherConsoleGame
+    public abstract class RitcherConsoleGame : IDisposable
     {
+        private bool _disposed;
+        private IntPtr _screenBufferHandle;
         private short _screenHeight;
         private short _screenWidth;
-        private IntPtr _screenBufferHandle;
         private ConsoleSmallRectangle _windowCoordinates;
 
         /// <summary>
@@ -63,6 +64,34 @@ namespace RitcherConsoleEngine
 
                 _screenWidth = value;
             }
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes managed and unmanaged resources.
+        /// </summary>
+        /// <param name="disposing">Whether or not it is called manually or by GC.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            if (disposing)
+            {
+                // Dispose managed resources
+            }
+
+            // Dispose unmanaged resources
+            if (_screenBufferHandle != IntPtr.Zero)
+                WinConsoleAPI.CloseHandle(_screenBufferHandle);
+
+            _disposed = true;
         }
     }
 }
