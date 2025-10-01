@@ -24,9 +24,10 @@ namespace RitcherConsoleEngine.WinAPI
         /// </summary>
         /// <param name="screenBufferHandle">A handle to the console screen buffer.</param>
         /// <returns>True on success, otherwise false.</returns>
-        public static bool SetActiveScreenBuffer(IntPtr screenBufferHandle)
+        public static void SetActiveScreenBuffer(IntPtr screenBufferHandle)
         {
-            return SetConsoleActiveScreenBuffer(screenBufferHandle);
+            CheckWinAPIResult(SetConsoleActiveScreenBuffer(screenBufferHandle),
+                "Failed to set console active screen buffer");
         }
 
         /// <summary>
@@ -35,9 +36,10 @@ namespace RitcherConsoleEngine.WinAPI
         /// <param name="screenBufferHandle">A handle to the console screen buffer.</param>
         /// <param name="bufferSize">Size of a screen buffer.</param>
         /// <returns>True on success, otherwise false.</returns>
-        public static bool SetScreenBufferSize(IntPtr screenBufferHandle, ConsoleCoordinate bufferSize)
+        public static void SetScreenBufferSize(IntPtr screenBufferHandle, ConsoleCoordinate bufferSize)
         {
-            return SetConsoleScreenBufferSize(screenBufferHandle, bufferSize);
+            CheckWinAPIResult(SetConsoleScreenBufferSize(screenBufferHandle, bufferSize),
+                "Failed to set new console screen buffer size");
         }
 
         /// <summary>
@@ -48,9 +50,10 @@ namespace RitcherConsoleEngine.WinAPI
         ///                                      otherwise coordinates are relative to the current window-corner coordinates.</param>
         /// <param name="coordinates">Coordinates of the new window.</param>
         /// <returns>True on success, otherwise false.</returns>
-        public static bool SetWindowInfo(IntPtr screenBufferHandle, bool areAbsoluteCoordinates, ref ConsoleSmallRectangle coordinates)
+        public static void SetWindowInfo(IntPtr screenBufferHandle, bool areAbsoluteCoordinates, ref ConsoleSmallRectangle coordinates)
         {
-            return SetConsoleWindowInfo(screenBufferHandle, areAbsoluteCoordinates, ref coordinates);
+            CheckWinAPIResult(SetConsoleWindowInfo(screenBufferHandle, areAbsoluteCoordinates, ref coordinates),
+                "Failed to set console window info");
         }
 
         /// <summary>
@@ -62,9 +65,25 @@ namespace RitcherConsoleEngine.WinAPI
         /// <param name="startPosition">Start position of write.</param>
         /// <param name="writeArea">Write rectangle area (upper-left corner and lower-right corner).</param>
         /// <returns>True on success, otherwise false.</returns>
-        public static bool WriteToScreenBuffer(IntPtr screenBufferHandle, ConsoleCharInfo[] screenData, ConsoleCoordinate bufferSize, ConsoleCoordinate startPosition, ref ConsoleSmallRectangle writeArea)
+        public static void WriteToScreenBuffer(IntPtr screenBufferHandle, ConsoleCharInfo[] screenData, ConsoleCoordinate bufferSize, ConsoleCoordinate startPosition, ref ConsoleSmallRectangle writeArea)
         {
-            return WriteConsoleOutput(screenBufferHandle, screenData, bufferSize, startPosition, ref writeArea);
+            CheckWinAPIResult(WriteConsoleOutput(screenBufferHandle, screenData, bufferSize, startPosition, ref writeArea),
+                "Failed to write to the console screen buffer");
+        }
+
+        /// <summary>
+        /// Checks Window API call result.
+        /// </summary>
+        /// <param name="apiCallResult">Windows API call result.</param>
+        /// <param name="failureMessage">Message to be thrown with exception.</param>
+        /// <exception cref="ConsoleCoreException">Throws Console CORE exception if windows API fails.</exception>
+        private static void CheckWinAPIResult(bool apiCallResult, string failureMessage)
+        {
+            if (!apiCallResult)
+            {
+                var errorCode = Marshal.GetLastWin32Error();
+                throw new ConsoleCoreException($"{failureMessage}. Error code: {errorCode}.");
+            }
         }
 
         #region Import Console functions
