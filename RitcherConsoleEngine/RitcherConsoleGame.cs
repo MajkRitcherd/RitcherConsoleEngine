@@ -1,4 +1,5 @@
 ﻿using RitcherConsoleEngine.WinAPI;
+using RitcherConsoleEngine.WinAPI.ConsoleApiEnums;
 using RitcherConsoleEngine.WinAPI.ConsoleApiStructures;
 
 namespace RitcherConsoleEngine
