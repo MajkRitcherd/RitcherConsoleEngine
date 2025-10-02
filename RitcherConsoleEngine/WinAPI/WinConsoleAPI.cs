@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using RitcherConsoleEngine.WinAPI.ConsoleApiEnums;
 using RitcherConsoleEngine.WinAPI.ConsoleApiStructures;
 
 namespace RitcherConsoleEngine.WinAPI
@@ -28,6 +29,17 @@ namespace RitcherConsoleEngine.WinAPI
         {
             return CheckWinAPIResult(CreateConsoleScreenBuffer((uint)accessRights, (uint)shareModes, IntPtr.Zero, 1, IntPtr.Zero),
                 "Failed to create console screen buffer");
+        }
+
+        /// <summary>
+        /// Retrieves a handle to the specified standard device (standard input, standard output, or standard error).
+        /// </summary>
+        /// <param name="handleType">Type of handle (standard input, standard output, or standard error).</param>
+        /// <returns>Handle to the standard device.</returns>
+        public static IntPtr GetStdHandle(StdHandleTypes handleType)
+        {
+            return CheckWinAPIResult(GetStdHandle((int)handleType),
+                "Failed to retrieve STD handle");
         }
 
         /// <summary>
@@ -144,6 +156,16 @@ namespace RitcherConsoleEngine.WinAPI
         /// <returns>Handle to the new console screen buffer on success, otherwise INVALID_HANDLE_VALUE.</returns>
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr CreateConsoleScreenBuffer(uint dwDesiredAccess, uint dwShareMode, IntPtr lpSecurityAttributes, uint dwFlags, IntPtr lpScreenBufferData);
+
+        /// <summary>
+        /// Retrieves a handle to the specified standard device (standard input, standard output, or standard error).
+        /// See https://learn.microsoft.com/en-us/windows/console/getstdhandle.
+        /// </summary>
+        /// <param name="nStdHandle">The standard device. This parameter can be one of the following values.</param>
+        /// <returns>If the function succeeds, the return value is a handle to the specified device, or a redirected handle set by a previous call to SetStdHandle.
+        ///          If the function fails, the return value is INVALID_HANDLE_VALUE</returns>
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern IntPtr GetStdHandle(int nStdHandle);
 
         /// <summary>
         /// Sets the specified screen buffer to be the currently displayed console screen buffer.

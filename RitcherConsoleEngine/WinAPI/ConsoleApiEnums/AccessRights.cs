@@ -1,4 +1,4 @@
-﻿namespace RitcherConsoleEngine.WinAPI
+﻿namespace RitcherConsoleEngine.WinAPI.ConsoleApiEnums
 {
     /// <summary>
     /// Windows console access rights.
