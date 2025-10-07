@@ -14,6 +14,8 @@ namespace RitcherConsoleEngine
     public abstract class RitcherConsoleGame : IDisposable
     {
         private readonly Thread _gameThread;
+        private readonly ConsoleCoordinate _screenBufferCoordinates;
+        private readonly ConsoleCharInfo[] _screenData;
         private bool _disposed;
         private IntPtr _screenBufferHandle;
         private ConsoleCoordinate _screenBufferSize;
@@ -32,7 +34,9 @@ namespace RitcherConsoleEngine
             ScreenWidth = screenWidth;
 
             _gameThread = new Thread(GameThreadLoop);
+            _screenBufferCoordinates = new ConsoleCoordinate { X = 0, Y = 0 };
             _screenBufferSize = new ConsoleCoordinate { X = ScreenWidth, Y = ScreenHeight };
+            _screenData = new ConsoleCharInfo[ScreenWidth * screenHeight];
             _windowCoordinates = new ConsoleSmallRectangle { Left = 0, Top = 0, Right = (short)(ScreenWidth - 1), Bottom = (short)(ScreenHeight - 1) };
         }
 
@@ -107,6 +111,22 @@ namespace RitcherConsoleEngine
         }
 
         /// <summary>
+        /// Draws a character at specified position with specified color.
+        /// </summary>
+        /// <param name="column">Column position in the console.</param>
+        /// <param name="row">Row position in the console.</param>
+        /// <param name="character">Character to be drawn.</param>
+        /// <param name="color">Color of the character.</param>
+        protected void Draw(short column, short row, char character, ConsoleColor color)
+        {
+            if (column >= 0 && column < ScreenWidth && row >= 0 && row < ScreenHeight)
+            {
+                var index = row * ScreenWidth + column;
+                _screenData[index] = new ConsoleCharInfo() { Character = character, Attributes = (short)color };
+            }
+        }
+
+        /// <summary>
         /// Creates the console using WinAPI calls.
         /// </summary>
         /// <remarks>
@@ -132,8 +152,8 @@ namespace RitcherConsoleEngine
 
             // Prepare console buffer/size
             _screenBufferHandle = WinConsoleAPI.CreateScreenBuffer(AccessRights.GenericReadAndWrite, ShareModes.FileShareReadAndWrite);
-            WinConsoleAPI.SetActiveScreenBuffer(_screenBufferHandle);
             WinConsoleAPI.SetScreenBufferSize(_screenBufferHandle, _screenBufferSize);
+            WinConsoleAPI.SetActiveScreenBuffer(_screenBufferHandle);
             WinConsoleAPI.SetWindowInfo(_screenBufferHandle, true, ref _windowCoordinates);
 
             return true;
@@ -146,6 +166,7 @@ namespace RitcherConsoleEngine
         {
             while (true)
             {
+                WinConsoleAPI.WriteToScreenBuffer(_screenBufferHandle, _screenData, _screenBufferSize, _screenBufferCoordinates, ref _windowCoordinates);
             }
         }
     }

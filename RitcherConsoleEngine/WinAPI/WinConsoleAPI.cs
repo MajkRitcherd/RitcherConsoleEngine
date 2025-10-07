@@ -212,7 +212,7 @@ namespace RitcherConsoleEngine.WinAPI
         /// <param name="lpWriteRegion">A pointer to a <see cref="ConsoleSmallRectangle"/> structure.
         ///                             On input, the structure members specify the upper-left and lower-right coordinates of the console screen buffer rectangle to write to.</param>
         /// <returns>True on success, False on fail.</returns>
-        [DllImport("kernel32.dll", SetLastError = true)]
+        [DllImport("kernel32.dll", SetLastError = true, EntryPoint = "WriteConsoleOutputW")]
         private static extern bool WriteConsoleOutput(IntPtr hConsoleOutput, ConsoleCharInfo[] lpBuffer, ConsoleCoordinate dwBufferSize, ConsoleCoordinate dwBufferCoord, ref ConsoleSmallRectangle lpWriteRegion);
 
         #endregion Import Console functions
