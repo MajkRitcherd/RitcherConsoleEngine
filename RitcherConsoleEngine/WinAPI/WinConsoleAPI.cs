@@ -32,6 +32,17 @@ namespace RitcherConsoleEngine.WinAPI
         }
 
         /// <summary>
+        /// Retrieves information about the specified console screen buffer.
+        /// </summary>
+        /// <param name="screenBufferHandle">A handle to the console screen buffer.</param>
+        /// <param name="screenBufferInfo">Console screen buffer info.</param>
+        public static void GetScreenBufferInfo(IntPtr screenBufferHandle, out ConsoleScreenBufferInfo screenBufferInfo)
+        {
+            CheckWinAPIResult(GetConsoleScreenBufferInfo(screenBufferHandle, out screenBufferInfo),
+                "Failed to get console screen buffer info");
+        }
+
+        /// <summary>
         /// Retrieves a handle to the specified standard device (standard input, standard output, or standard error).
         /// </summary>
         /// <param name="handleType">Type of handle (standard input, standard output, or standard error).</param>
@@ -156,6 +167,16 @@ namespace RitcherConsoleEngine.WinAPI
         /// <returns>Handle to the new console screen buffer on success, otherwise INVALID_HANDLE_VALUE.</returns>
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr CreateConsoleScreenBuffer(uint dwDesiredAccess, uint dwShareMode, IntPtr lpSecurityAttributes, uint dwFlags, IntPtr lpScreenBufferData);
+
+        /// <summary>
+        /// Retrieves information about the specified console screen buffer.
+        /// See https://learn.microsoft.com/en-us/windows/console/getconsolescreenbufferinfo.
+        /// </summary>
+        /// <param name="hConsoleOutput">A handle to the console screen buffer.</param>
+        /// <param name="lpConsoleScreenBufferInfo">A pointer to a <see cref="ConsoleScreenBufferInfo"/> structure that receives the console screen buffer information.</param>
+        /// <returns>True on success, False on fail.</returns>
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool GetConsoleScreenBufferInfo(IntPtr hConsoleOutput, out ConsoleScreenBufferInfo lpConsoleScreenBufferInfo);
 
         /// <summary>
         /// Retrieves a handle to the specified standard device (standard input, standard output, or standard error).
