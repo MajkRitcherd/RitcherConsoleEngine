@@ -19,6 +19,16 @@ namespace RitcherConsoleEngine.WinAPI
         }
 
         /// <summary>
+        /// Attaches the calling process to the console of the specified process as a client application.
+        /// </summary>
+        /// <param name="processId">The identifier of the process whose console is to be used. </param>
+        public static void AttachConsole(uint processId)
+        {
+            CheckWinAPIResult(AttachConsoleInternal(processId),
+                "Failed to attach the calling process to the console of the specified process");
+        }
+
+        /// <summary>
         /// Closes an open object handle.
         /// </summary>
         /// <param name="handle">A valid handle to an open object.</param>
@@ -184,6 +194,15 @@ namespace RitcherConsoleEngine.WinAPI
         /// <returns>True on success, False on fail.</returns>
         [DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true)]
         private static extern bool AllocConsoleInterval();
+
+        /// <summary>
+        /// Attaches the calling process to the console of the specified process as a client application.
+        /// See https://learn.microsoft.com/en-us/windows/console/attachconsole
+        /// </summary>
+        /// <param name="dwProcessId">The identifier of the process whose console is to be used.</param>
+        /// <returns>True on success, False on fail.</returns>
+        [DllImport("kernel32.dll", EntryPoint = "AttachConsole", SetLastError = true)]
+        private static extern bool AttachConsoleInternal(uint dwProcessId);
 
         /// <summary>
         /// Closes an open object handle.
