@@ -83,6 +83,20 @@ namespace RitcherConsoleEngine.WinAPI
         }
 
         /// <summary>
+        /// Sets extended information about the current console font.
+        /// </summary>
+        /// <param name="screenBufferHandle">A handle to the console screen buffer. <br />
+        ///                                  </param>
+        /// <param name="isForMaxWindow">If this parameter is TRUE, font information is set for the maximum window size. <br />
+        ///                              If this parameter is FALSE, font information is set for the current window size.</param>
+        /// <param name="fontInfo">Font information.</param>
+        public static void SetCurrentFont(IntPtr screenBufferHandle, bool isForMaxWindow, ref ConsoleFontInfo fontInfo)
+        {
+            CheckWinAPIResult(SetCurrentConsoleFontEx(screenBufferHandle, isForMaxWindow, ref fontInfo),
+                "Failed to set current console font");
+        }
+
+        /// <summary>
         /// Changes the size of the specified console screen buffer.
         /// </summary>
         /// <param name="screenBufferHandle">A handle to the console screen buffer.</param>
@@ -252,6 +266,19 @@ namespace RitcherConsoleEngine.WinAPI
         /// <returns>True on success, False on fail.</returns>
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool SetConsoleWindowInfo(IntPtr hConsoleOutput, bool bAbsolute, ref ConsoleSmallRectangle lpConsoleWindow);
+
+        /// <summary>
+        /// Sets extended information about the current console font. <br />
+        /// See https://learn.microsoft.com/en-us/windows/console/setcurrentconsolefontex.
+        /// </summary>
+        /// <param name="hConsoleOutput">A handle to the console screen buffer. <br />
+        ///                              The handle must have the GENERIC_WRITE access right.</param>
+        /// <param name="bMaximumWindow">If this parameter is TRUE, font information is set for the maximum window size. <br />
+        ///                              If this parameter is FALSE, font information is set for the current window size.</param>
+        /// <param name="lpConsoleCurrentFontEx">A pointer to a <see cref="ConsoleFontInfo"/> structure that contains the font information.</param>
+        /// <returns>True on success, False on fail.</returns>
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool SetCurrentConsoleFontEx(IntPtr hConsoleOutput, bool bMaximumWindow, ref ConsoleFontInfo lpConsoleCurrentFontEx);
 
         /// <summary>
         /// Writes character and color attribute data to a specified rectangular block of character cells in a console screen buffer. <br />
