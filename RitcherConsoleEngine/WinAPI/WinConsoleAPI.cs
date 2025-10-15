@@ -10,6 +10,15 @@ namespace RitcherConsoleEngine.WinAPI
     internal static class WinConsoleAPI
     {
         /// <summary>
+        /// Allocates a new console for the calling process.
+        /// </summary>
+        public static void AllocConsole()
+        {
+            CheckWinAPIResult(AllocConsoleInterval(),
+                "Failed to allocate a new console for the calling process");
+        }
+
+        /// <summary>
         /// Closes an open object handle.
         /// </summary>
         /// <param name="handle">A valid handle to an open object.</param>
@@ -29,6 +38,15 @@ namespace RitcherConsoleEngine.WinAPI
         {
             return CheckWinAPIResult(CreateConsoleScreenBuffer((uint)accessRights, (uint)shareModes, IntPtr.Zero, 1, IntPtr.Zero),
                 "Failed to create console screen buffer");
+        }
+
+        /// <summary>
+        /// Detaches the calling process from its console.
+        /// </summary>
+        public static void FreeConsole()
+        {
+            CheckWinAPIResult(FreeConsoleInternal(),
+                "Failed to detach the calling process from its console");
         }
 
         /// <summary>
@@ -146,6 +164,14 @@ namespace RitcherConsoleEngine.WinAPI
         #region Import Console functions
 
         /// <summary>
+        /// Allocates a new console for the calling process. <br />
+        /// See https://learn.microsoft.com/en-us/windows/console/allocconsole
+        /// </summary>
+        /// <returns>True on success, False on fail.</returns>
+        [DllImport("kernel32.dll", EntryPoint = "AllocConsole", SetLastError = true)]
+        private static extern bool AllocConsoleInterval();
+
+        /// <summary>
         /// Closes an open object handle.
         /// See https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle.
         /// </summary>
@@ -167,6 +193,14 @@ namespace RitcherConsoleEngine.WinAPI
         /// <returns>Handle to the new console screen buffer on success, otherwise INVALID_HANDLE_VALUE.</returns>
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr CreateConsoleScreenBuffer(uint dwDesiredAccess, uint dwShareMode, IntPtr lpSecurityAttributes, uint dwFlags, IntPtr lpScreenBufferData);
+
+        /// <summary>
+        /// Detaches the calling process from its console. <br />
+        /// See https://learn.microsoft.com/en-us/windows/console/freeconsole.
+        /// </summary>
+        /// <returns>True on success, False on fail.</returns>
+        [DllImport("kernel32.dll", EntryPoint = "FreeConsole", SetLastError = true)]
+        private static extern bool FreeConsoleInternal();
 
         /// <summary>
         /// Retrieves information about the specified console screen buffer.
