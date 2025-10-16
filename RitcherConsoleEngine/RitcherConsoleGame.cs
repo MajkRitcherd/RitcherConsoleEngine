@@ -1,4 +1,5 @@
-﻿using RitcherConsoleEngine.WinAPI;
+﻿using System.Runtime.InteropServices;
+using RitcherConsoleEngine.WinAPI;
 using RitcherConsoleEngine.WinAPI.ConsoleApiEnums;
 using RitcherConsoleEngine.WinAPI.ConsoleApiStructures;
 
@@ -142,13 +143,23 @@ namespace RitcherConsoleEngine
             {
                 Left = 0,
                 Top = 0,
-                Right = 0,
-                Bottom = 0
+                Right = 1,
+                Bottom = 1,
             };
 
             // Set output console to small window so we can set any window size later on
             var handleConsole = WinConsoleAPI.GetStdHandle(StdHandleTypes.OutputHandle);
             WinConsoleAPI.SetWindowInfo(handleConsole, true, ref smallRect);
+
+            var fontInfo = new ConsoleFontInfo()
+            {
+                Size = (uint)Marshal.SizeOf<ConsoleFontInfo>(),
+                FontSize = new ConsoleCoordinate { X = 8, Y = 16 },
+                FontWeight = 400,
+                FaceName = "Consolas",
+            };
+
+            WinConsoleAPI.SetCurrentFont(handleConsole, false, ref fontInfo);
 
             // Prepare console buffer/size
             _screenBufferHandle = WinConsoleAPI.CreateScreenBuffer(AccessRights.GenericReadAndWrite, ShareModes.FileShareReadAndWrite);
