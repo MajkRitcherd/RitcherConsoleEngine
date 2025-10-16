@@ -23,6 +23,7 @@ namespace RitcherConsoleEngine
         private short _screenHeight;
         private short _screenWidth;
         private ConsoleSmallRectangle _windowCoordinates;
+        private IntPtr _windowHandle;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RitcherConsoleGame"/> class.
@@ -146,11 +147,6 @@ namespace RitcherConsoleEngine
                 Right = 1,
                 Bottom = 1,
             };
-
-            // Set output console to small window so we can set any window size later on
-            var handleConsole = WinConsoleAPI.GetStdHandle(StdHandleTypes.OutputHandle);
-            WinConsoleAPI.SetWindowInfo(handleConsole, true, ref smallRect);
-
             var fontInfo = new ConsoleFontInfo()
             {
                 Size = (uint)Marshal.SizeOf<ConsoleFontInfo>(),
@@ -159,12 +155,17 @@ namespace RitcherConsoleEngine
                 FaceName = "Consolas",
             };
 
-            WinConsoleAPI.SetCurrentFont(handleConsole, false, ref fontInfo);
+            // Set output console to small window so we can set any window size later on
+            _windowHandle = WinConsoleAPI.GetStdHandle(StdHandleTypes.OutputHandle);
+            WinConsoleAPI.SetWindowInfo(_windowHandle, true, ref smallRect);
 
             // Prepare console buffer/size
             _screenBufferHandle = WinConsoleAPI.CreateScreenBuffer(AccessRights.GenericReadAndWrite, ShareModes.FileShareReadAndWrite);
             WinConsoleAPI.SetScreenBufferSize(_screenBufferHandle, _screenBufferSize);
+            WinConsoleAPI.SetCurrentFont(_screenBufferHandle, false, ref fontInfo);
             WinConsoleAPI.SetActiveScreenBuffer(_screenBufferHandle);
+
+            // Set size of physical window
             WinConsoleAPI.SetWindowInfo(_screenBufferHandle, true, ref _windowCoordinates);
 
             return true;
