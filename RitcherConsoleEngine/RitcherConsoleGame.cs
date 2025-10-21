@@ -140,6 +140,19 @@ namespace RitcherConsoleEngine
         }
 
         /// <summary>
+        /// Custom logic on application creation.
+        /// </summary>
+        /// <returns>True, if creation was successful, otherwise false.</returns>
+        protected abstract bool OnCreate();
+
+        /// <summary>
+        /// Custom logic on console update.
+        /// </summary>
+        /// <param name="elapsedTime">Elapsed time since last update.</param>
+        /// <returns>True, if update was successful, otherwise false.</returns>
+        protected abstract bool OnUpdate(float elapsedTime);
+
+        /// <summary>
         /// Creates the console using WinAPI calls.
         /// </summary>
         /// <remarks>
