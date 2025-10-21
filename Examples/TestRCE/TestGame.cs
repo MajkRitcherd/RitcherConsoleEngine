@@ -12,5 +12,15 @@ namespace TestRCE
                 for (short j = 0; j < ScreenHeight; j++)
                     Draw(i, j, '\u2588', (ConsoleColor)rnd.Next(0, 16));
         }
+
+        protected override bool OnCreate()
+        {
+            return false;
+        }
+
+        protected override bool OnUpdate(float elapsedTime)
+        {
+            return false;
+        }
     }
 }
