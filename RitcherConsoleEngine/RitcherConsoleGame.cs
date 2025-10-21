@@ -24,6 +24,7 @@ namespace RitcherConsoleEngine
         private short _screenWidth;
         private ConsoleSmallRectangle _windowCoordinates;
         private IntPtr _windowHandle;
+        private ConsoleScreenBufferInfo _originalBufferInfo;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RitcherConsoleGame"/> class.
@@ -105,6 +106,14 @@ namespace RitcherConsoleEngine
                 // Dispose managed resources
             }
 
+            if (_windowHandle != IntPtr.Zero)
+            {
+                // Restore original console state
+                WinConsoleAPI.SetActiveScreenBuffer(_windowHandle);
+                WinConsoleAPI.SetScreenBufferSize(_windowHandle, _originalBufferInfo.Size);
+                WinConsoleAPI.SetWindowInfo(_windowHandle, true, ref _originalBufferInfo.Window);
+            }
+
             // Dispose unmanaged resources
             if (_screenBufferHandle != IntPtr.Zero)
                 WinConsoleAPI.CloseHandle(_screenBufferHandle);
@@ -157,6 +166,7 @@ namespace RitcherConsoleEngine
 
             // Set output console to small window so we can set any window size later on
             _windowHandle = WinConsoleAPI.GetStdHandle(StdHandleTypes.OutputHandle);
+            WinConsoleAPI.GetScreenBufferInfo(_windowHandle, out _originalBufferInfo);
             WinConsoleAPI.SetWindowInfo(_windowHandle, true, ref smallRect);
 
             // Prepare console buffer/size
@@ -165,6 +175,13 @@ namespace RitcherConsoleEngine
             WinConsoleAPI.SetCurrentFont(_screenBufferHandle, false, ref fontInfo);
             WinConsoleAPI.SetActiveScreenBuffer(_screenBufferHandle);
 
+            // Check if screen size is not too big for current font size
+            WinConsoleAPI.GetScreenBufferInfo(_screenBufferHandle, out var screenBufferInfo);
+            if (ScreenWidth > screenBufferInfo.MaximumWindowSize.X)
+                throw new ConsoleCoreException("Screen width is too big for the current console font size.");
+            if (ScreenHeight > screenBufferInfo.MaximumWindowSize.Y)
+                throw new ConsoleCoreException("Screen height is too big for the current console font size.");
+            
             // Set size of physical window
             WinConsoleAPI.SetWindowInfo(_screenBufferHandle, true, ref _windowCoordinates);
 
