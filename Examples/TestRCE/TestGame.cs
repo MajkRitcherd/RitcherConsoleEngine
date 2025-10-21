@@ -4,8 +4,8 @@ namespace TestRCE
 {
     internal class TestGame : RitcherConsoleGame
     {
-        public TestGame(short screenWidth, short screenHeight)
-            : base(screenWidth, screenHeight)
+        public TestGame(ConsoleProperties consoleProperties)
+            : base(consoleProperties)
         {
             var rnd = new Random();
             for (short i = 0; i < ScreenWidth; i++)

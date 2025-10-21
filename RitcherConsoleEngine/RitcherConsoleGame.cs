@@ -14,32 +14,34 @@ namespace RitcherConsoleEngine
     /// </remarks>
     public abstract class RitcherConsoleGame : IDisposable
     {
+        private readonly ConsoleProperties _consoleProperties;
         private readonly Thread _gameThread;
         private readonly ConsoleCoordinate _screenBufferCoordinates;
         private readonly ConsoleCharInfo[] _screenData;
         private bool _disposed;
+        private ConsoleScreenBufferInfo _originalBufferInfo;
         private IntPtr _screenBufferHandle;
         private ConsoleCoordinate _screenBufferSize;
         private short _screenHeight;
         private short _screenWidth;
         private ConsoleSmallRectangle _windowCoordinates;
         private IntPtr _windowHandle;
-        private ConsoleScreenBufferInfo _originalBufferInfo;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RitcherConsoleGame"/> class.
         /// </summary>
-        /// <param name="screenWidth">Screen width (console columns).</param>
-        /// <param name="screenHeight">Screen height (console rows).</param>
-        protected RitcherConsoleGame(short screenWidth = 160, short screenHeight = 80)
+        /// <param name="consoleProperties">Console properties (Holds screen width and height, font width and height).</param>
+        protected RitcherConsoleGame(ConsoleProperties consoleProperties)
         {
-            ScreenHeight = screenHeight;
-            ScreenWidth = screenWidth;
+            _consoleProperties = consoleProperties;
+
+            ScreenHeight = _consoleProperties.ScreenHeight;
+            ScreenWidth = _consoleProperties.ScreenWidth;
 
             _gameThread = new Thread(GameThreadLoop);
             _screenBufferCoordinates = new ConsoleCoordinate { X = 0, Y = 0 };
             _screenBufferSize = new ConsoleCoordinate { X = ScreenWidth, Y = ScreenHeight };
-            _screenData = new ConsoleCharInfo[ScreenWidth * screenHeight];
+            _screenData = new ConsoleCharInfo[ScreenWidth * ScreenHeight];
             _windowCoordinates = new ConsoleSmallRectangle { Left = 0, Top = 0, Right = (short)(ScreenWidth - 1), Bottom = (short)(ScreenHeight - 1) };
         }
 
@@ -159,7 +161,7 @@ namespace RitcherConsoleEngine
             var fontInfo = new ConsoleFontInfo()
             {
                 Size = (uint)Marshal.SizeOf<ConsoleFontInfo>(),
-                FontSize = new ConsoleCoordinate { X = 8, Y = 16 },
+                FontSize = new ConsoleCoordinate { X = _consoleProperties.FontWidth, Y = _consoleProperties.FontHeight },
                 FontWeight = 400,
                 FaceName = "Consolas",
             };
@@ -181,7 +183,7 @@ namespace RitcherConsoleEngine
                 throw new ConsoleCoreException("Screen width is too big for the current console font size.");
             if (ScreenHeight > screenBufferInfo.MaximumWindowSize.Y)
                 throw new ConsoleCoreException("Screen height is too big for the current console font size.");
-            
+
             // Set size of physical window
             WinConsoleAPI.SetWindowInfo(_screenBufferHandle, true, ref _windowCoordinates);
 
