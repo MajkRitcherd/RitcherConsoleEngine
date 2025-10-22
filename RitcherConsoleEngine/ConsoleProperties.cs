@@ -21,9 +21,9 @@
         public static ConsoleProperties Default => new()
         {
             ScreenWidth = 160,
-            ScreenHeight = 80,
-            FontWidth = 8,
-            FontHeight = 16,
+            ScreenHeight = 50,
+            FontWidth = 6,
+            FontHeight = 12,
         };
 
         /// <summary>
