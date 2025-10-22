@@ -2,25 +2,22 @@
 
 namespace TestRCE
 {
-    internal class TestGame : RitcherConsoleGame
+    internal class TestGame(ConsoleProperties consoleProperties) : RitcherConsoleGame(consoleProperties)
     {
-        public TestGame(ConsoleProperties consoleProperties)
-            : base(consoleProperties)
-        {
-            var rnd = new Random();
-            for (short i = 0; i < ScreenWidth; i++)
-                for (short j = 0; j < ScreenHeight; j++)
-                    Draw(i, j, '\u2588', (ConsoleColor)rnd.Next(0, 16));
-        }
+        private readonly Random _rnd = new();
 
         protected override bool OnCreate()
         {
-            return false;
+            return true;
         }
 
-        protected override bool OnUpdate(float elapsedTime)
+        protected override bool OnUpdate(double elapsedTime)
         {
-            return false;
+            for (short i = 0; i < ScreenWidth; i++)
+                for (short j = 0; j < ScreenHeight; j++)
+                    Draw(i, j, '\u2588', (ConsoleColor)_rnd.Next(0, 16));
+
+            return true;
         }
     }
 }

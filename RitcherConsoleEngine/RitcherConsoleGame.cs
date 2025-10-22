@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 using RitcherConsoleEngine.WinAPI;
 using RitcherConsoleEngine.WinAPI.ConsoleApiEnums;
 using RitcherConsoleEngine.WinAPI.ConsoleApiStructures;
@@ -19,11 +20,13 @@ namespace RitcherConsoleEngine
         private readonly ConsoleCoordinate _screenBufferCoordinates;
         private readonly ConsoleCharInfo[] _screenData;
         private bool _disposed;
+        private bool _isRunning;
         private ConsoleScreenBufferInfo _originalBufferInfo;
         private IntPtr _screenBufferHandle;
         private ConsoleCoordinate _screenBufferSize;
         private short _screenHeight;
         private short _screenWidth;
+        private Stopwatch? _stopwatch;
         private ConsoleSmallRectangle _windowCoordinates;
         private IntPtr _windowHandle;
 
@@ -90,6 +93,12 @@ namespace RitcherConsoleEngine
             if (!CreateConsole())
                 throw new ConsoleCoreException("Failed to create console");
 
+            if (!OnCreate())
+                throw new ConsoleCoreException("Failed to load resources on application creation.");
+
+            _stopwatch = Stopwatch.StartNew();
+            _isRunning = true;
+
             _gameThread.Start();
             _gameThread.Join();
         }
@@ -150,7 +159,7 @@ namespace RitcherConsoleEngine
         /// </summary>
         /// <param name="elapsedTime">Elapsed time since last update.</param>
         /// <returns>True, if update was successful, otherwise false.</returns>
-        protected abstract bool OnUpdate(float elapsedTime);
+        protected abstract bool OnUpdate(double elapsedTime);
 
         /// <summary>
         /// Creates the console using WinAPI calls.
@@ -208,8 +217,24 @@ namespace RitcherConsoleEngine
         /// </summary>
         private void GameThreadLoop()
         {
-            while (true)
+            var lastTick = _stopwatch!.ElapsedTicks;
+            var ticksPerSecond = Stopwatch.Frequency;
+
+            while (_isRunning)
             {
+                // Calculate elapsed time
+                var currentTick = _stopwatch.ElapsedTicks;
+                var deltaTicks = currentTick - lastTick;
+                lastTick = currentTick;
+
+                var elapsedTime = (double)deltaTicks / ticksPerSecond;
+
+                if (!OnUpdate(elapsedTime))
+                {
+                    _isRunning = false;
+                    break;
+                }
+
                 WinConsoleAPI.WriteToScreenBuffer(_screenBufferHandle, _screenData, _screenBufferSize, _screenBufferCoordinates, ref _windowCoordinates);
             }
         }
